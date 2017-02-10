@@ -149,6 +149,7 @@ export default class Drawer extends Component {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'rgba(113, 102, 80, 1)',
       },
     }
 
@@ -244,7 +245,7 @@ export default class Drawer extends Component {
     this._panning = false
     this.shouldOpenDrawer(gestureState.dx) ? this.open() : this.close()
   };
-    
+
   onStartShouldSetPanResponderCapture = (e, gestureState) => {
     if (this.shouldCaptureGestures()) return this.processShouldSet(e, gestureState)
     return false
@@ -369,7 +370,7 @@ export default class Drawer extends Component {
     }
   };
 
-  open = (type, cb) => {
+  open = (type) => {
     let start = this._left
     let end = this.getOpenLeft()
 
@@ -394,16 +395,11 @@ export default class Drawer extends Component {
         this.adjustForCaptureGestures()
         this.props.onOpen()
         this.clearInteractionHandle()
-
-        if(typeof type === 'function') {
-          type() // this is actually a callback
-        } else cb && cb()
-        
       }
     })
   };
 
-  close = (type, cb) => {
+  close = (type) => {
     let start = this._left
     let end = this.getClosedLeft()
 
@@ -428,11 +424,6 @@ export default class Drawer extends Component {
         this.adjustForCaptureGestures()
         this.props.onClose()
         this.clearInteractionHandle()
-
-        if(typeof type === 'function') {
-          type() // this is actually a callback
-        } else cb && cb()
-
       }
     })
   };
@@ -501,11 +492,11 @@ export default class Drawer extends Component {
   };
   getOpenOffset = (props, viewport) => {
     if (typeof props.openDrawerOffset === 'function') return props.openDrawerOffset(viewport)
-    return props.openDrawerOffset > 1 || props.openDrawerOffset < 0 ? props.openDrawerOffset : props.openDrawerOffset * viewport.width
+    return props.openDrawerOffset % 1 === 0 ? props.openDrawerOffset : props.openDrawerOffset * viewport.width
   };
   getClosedOffset = (props, viewport) => {
     if (typeof props.closedDrawerOffset === 'function') return props.closedDrawerOffset(viewport)
-    return props.closedDrawerOffset > 1 || props.closedDrawerOffset < 0 ? props.closedDrawerOffset : props.closedDrawerOffset * viewport.width
+    return props.closedDrawerOffset % 1 === 0 ? props.closedDrawerOffset : props.closedDrawerOffset * viewport.width
   };
   /*** END DYNAMIC GETTERS ***/
 
@@ -519,6 +510,9 @@ export default class Drawer extends Component {
         onLayout={this.handleSetViewport}
         style={this.stylesheet.container}
         >
+        <View style={{ position: 'absolute', top: 0, left: 0, width: this.state.viewport.width, height: this.state.viewport.height }}>
+          {this.props.extraElement}
+        </View>
         {first}
         {second}
       </View>
